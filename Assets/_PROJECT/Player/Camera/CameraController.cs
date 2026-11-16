@@ -21,11 +21,15 @@ namespace ArTiX.SoulsLike.Camera
         [SerializeField, Tooltip("Relative at the pivot point of the camera target.")] private Vector3 anchorOffset;
         [SerializeField] private float maxPitch;
 
-        [SerializeField, Tooltip("How responsive the camera is. Each value represents the time for the camera to catch up with its target position.")] private Vector3 damping;
+        [SerializeField, Tooltip("How responsive the camera is. Each value represents the time for the camera to catch up with its target position.")]
+        private Vector3 damping;
 
         [Header("Debug"), Space(10)]
         [SerializeField] private Color targetGuizmoColor;
         [SerializeField] private Color anchorGuizmoColor;
+
+        private Vector3 anchorPosition;
+        private Vector3 cameraAnchorVelocity;
 
         private Quaternion AnchorRotation => Quaternion.Euler(targetPitch, targetYaw, 0);
         private float targetYaw;
@@ -47,11 +51,11 @@ namespace ArTiX.SoulsLike.Camera
 
                 targetYaw += rotationInput.x;
                 targetPitch += rotationInput.y * (inverseY ? 1 : -1);
-                targetPitch = Mathf.Clamp(targetPitch, -45, 45);
+                targetPitch = Mathf.Clamp(targetPitch, -maxPitch, maxPitch);
             }
 
             transform.position = CalculateTargetPosition();
-            transform.LookAt(GetAnchorPosition(), Vector3.up);
+            transform.LookAt(anchorPosition, Vector3.up);
         }
 
 #if UNITY_EDITOR
@@ -66,24 +70,32 @@ namespace ArTiX.SoulsLike.Camera
             Gizmos.DrawSphere(target.position, .1f);
 
             Gizmos.color = anchorGuizmoColor;
-            Gizmos.DrawSphere(GetAnchorPosition(), .1f);
+            Gizmos.DrawSphere(anchorPosition, .1f);
 
             Gizmos.color = anchorGuizmoColor;
-            Gizmos.DrawLine(target.position, GetAnchorPosition());
+            Gizmos.DrawLine(target.position, anchorPosition);
 
             Gizmos.color = anchorGuizmoColor;
-            Gizmos.DrawLine(GetAnchorPosition(), transform.position);
+            Gizmos.DrawLine(anchorPosition, transform.position);
         }
 
 #endif
 
         private Vector3 CalculateTargetPosition()
         {
-            Vector3 targetPosition = GetAnchorPosition();
-            targetPosition += AnchorRotation * Vector3.back * distance;
+            UpdateAnchorPosition();
+            Vector3 targetPosition = anchorPosition + AnchorRotation * Vector3.back * distance;
             return targetPosition;
         }
 
-        private Vector3 GetAnchorPosition() => target.position + anchorOffset;
+        private void UpdateAnchorPosition()
+        {
+            anchorPosition = Utilities.BetterVectorSmoothDamp(
+                a: anchorPosition,
+                b: target.position + anchorOffset,
+                currentVelocity: ref cameraAnchorVelocity,
+                smoothTime: damping,
+                maxSpeed: Vector3.one * float.MaxValue);
+        }
     }
 }

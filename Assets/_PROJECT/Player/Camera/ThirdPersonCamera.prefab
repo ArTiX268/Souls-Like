@@ -157,7 +157,7 @@ MonoBehaviour:
   inverseY: 0
   distance: 2.63
   anchorOffset: {x: 0.37, y: 1.64, z: 0}
-  maxPitch: 0
+  maxPitch: 30
   damping: {x: 0, y: 0, z: 0}
   targetGuizmoColor: {r: 0.86415094, g: 0.08315413, b: 0.08315413, a: 0.5529412}
   anchorGuizmoColor: {r: 0.11984571, g: 0.10767533, b: 0.8037735, a: 0.7176471}
