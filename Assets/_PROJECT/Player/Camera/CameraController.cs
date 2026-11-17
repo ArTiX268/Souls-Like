@@ -8,15 +8,16 @@ namespace ArTiX.SoulsLike.Camera
     [ExecuteInEditMode]
     public class CameraController : MonoBehaviour
     {
-        [SerializeField] private Transform target;
+        [SerializeField] private Transform followTarget;
 
         [Header("Input")]
         [SerializeField] private InputActionReference lookInput;
+        [SerializeField] private InputActionReference lockInput;
         [SerializeField, Min(0)] private float xSensitivity;
         [SerializeField, Min(0)] private float ySensitivity;
         [SerializeField] private bool inverseY;
 
-        [Header("Parameters"), Space(5)]
+        [Space(5), Header("Parameters")]
         [SerializeField, Min(0)] private float distance;
         [SerializeField, Tooltip("Relative at the pivot point of the camera target.")] private Vector3 anchorOffset;
         [SerializeField] private float maxPitch;
@@ -24,7 +25,7 @@ namespace ArTiX.SoulsLike.Camera
         [SerializeField, Tooltip("How responsive the camera is. Each value represents the time for the camera to catch up with its target position.")]
         private Vector3 damping;
 
-        [Header("Debug"), Space(10)]
+        [Space(10), Header("Debug")]
         [SerializeField] private Color targetGuizmoColor;
         [SerializeField] private Color anchorGuizmoColor;
 
@@ -35,11 +36,14 @@ namespace ArTiX.SoulsLike.Camera
         private float targetYaw;
         private float targetPitch;
 
+        private bool isLocked;
+        private Transform lockedTarget;
+
         private void LateUpdate()
         {
-            if (target == null)
+            if (followTarget == null)
             {
-                ErrorMessage.MissingReferenceWarning(nameof(target), nameof(CameraController), gameObject);
+                ErrorMessage.MissingReferenceWarning(nameof(followTarget), nameof(CameraController), gameObject);
                 return;
             }
 
@@ -55,31 +59,28 @@ namespace ArTiX.SoulsLike.Camera
             }
 
             transform.position = CalculateTargetPosition();
-            transform.LookAt(anchorPosition, Vector3.up);
+            transform.LookAt(isLocked ? lockedTarget.position : anchorPosition, Vector3.up);
         }
 
-#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            if (target == null)
+            if (followTarget == null)
             {
-                ErrorMessage.MissingReferenceWarning(nameof(target), nameof(CameraController), gameObject);
+                ErrorMessage.MissingReferenceWarning(nameof(followTarget), nameof(CameraController), gameObject);
                 return;
             }
             Gizmos.color = targetGuizmoColor;
-            Gizmos.DrawSphere(target.position, .1f);
+            Gizmos.DrawSphere(followTarget.position, .1f);
 
             Gizmos.color = anchorGuizmoColor;
             Gizmos.DrawSphere(anchorPosition, .1f);
 
             Gizmos.color = anchorGuizmoColor;
-            Gizmos.DrawLine(target.position, anchorPosition);
+            Gizmos.DrawLine(followTarget.position, anchorPosition);
 
             Gizmos.color = anchorGuizmoColor;
             Gizmos.DrawLine(anchorPosition, transform.position);
         }
-
-#endif
 
         private Vector3 CalculateTargetPosition()
         {
@@ -90,11 +91,12 @@ namespace ArTiX.SoulsLike.Camera
 
         private void UpdateAnchorPosition()
         {
+            Quaternion dampingModifier = Quaternion.Euler(0, transform.eulerAngles.y, 0);
             anchorPosition = Utilities.BetterVectorSmoothDamp(
                 a: anchorPosition,
-                b: target.position + anchorOffset,
+                b: followTarget.position + anchorOffset,
                 currentVelocity: ref cameraAnchorVelocity,
-                smoothTime: damping,
+                smoothTime: dampingModifier * damping,
                 maxSpeed: Vector3.one * float.MaxValue);
         }
     }

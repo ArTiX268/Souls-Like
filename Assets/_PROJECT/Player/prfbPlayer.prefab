@@ -85,6 +85,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerObj
       objectReference: {fileID: 0}
+    - target: {fileID: 6637935939546424054, guid: 9c841bc5619db7f4aa75d2e5c2d5a838, type: 3}
+      propertyPath: acceleration
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6637935939546424054, guid: 9c841bc5619db7f4aa75d2e5c2d5a838, type: 3}
+      propertyPath: desceleration
+      value: 0.1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -105,6 +113,14 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1800823435175984850, guid: 28022c88082db9e43ae5367c5a973cae, type: 3}
       propertyPath: target
+      value: 
+      objectReference: {fileID: 8842264411222539917}
+    - target: {fileID: 1800823435175984850, guid: 28022c88082db9e43ae5367c5a973cae, type: 3}
+      propertyPath: damping.y
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1800823435175984850, guid: 28022c88082db9e43ae5367c5a973cae, type: 3}
+      propertyPath: followTarget
       value: 
       objectReference: {fileID: 8842264411222539917}
     - target: {fileID: 8122841848041001538, guid: 28022c88082db9e43ae5367c5a973cae, type: 3}

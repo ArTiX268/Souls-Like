@@ -311,9 +311,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12a45a4d953b78e42a0a5a5f7ff858ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArTiX.SoulsLike.PlayerMovement
-  maxSpeed: 0
-  acceleration: 0
-  desceleration: 0
+  maxSpeed: 4
+  acceleration: 0.2
+  desceleration: 1
+  angularSpeed: 10
 --- !u!114 &792848803970316959
 MonoBehaviour:
   m_ObjectHideFlags: 0

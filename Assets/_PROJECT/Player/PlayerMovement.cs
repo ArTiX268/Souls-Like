@@ -6,15 +6,18 @@ namespace ArTiX.SoulsLike.Player
     public class PlayerMovement : MonoBehaviour
     {
         [SerializeField] private float maxSpeed;
-        [SerializeField] private float acceleration;
-        [SerializeField] private float gravity;
-        [SerializeField, Min(1)] private float desceleration;
+        [SerializeField, Tooltip("The time to reach max speed.")] private float acceleration;
+        [SerializeField] private float desceleration;
+
+        [SerializeField] private float angularSpeed;
 
         private PlayerInput input;
         private Rigidbody body;
 
-        private Vector3 velocity;
-        private Vector3 accelerationVector;
+        private Vector3 horizontalVelocity;
+        private Vector3 horizontalAcceleration;
+
+        private bool RotateToCameraDirection => input.MoveInput.sqrMagnitude > 0.001f;
 
         private void Awake()
         {
@@ -24,14 +27,36 @@ namespace ArTiX.SoulsLike.Player
 
         private void FixedUpdate()
         {
-            UpdateVelocity();
+            Transform camera = UnityEngine.Camera.main.transform;
+            Move(camera);
 
-            body.MovePosition(velocity * Time.deltaTime + body.position);
+            if (RotateToCameraDirection)
+                Rotate(camera);
         }
 
-        private void UpdateVelocity()
+        private void Move(Transform cameraTransform)
         {
+            Vector2 moveInput = input.MoveInput;
+            Vector3 directionVector = cameraTransform.forward * moveInput.y + cameraTransform.right * moveInput.x;
+            directionVector.y = 0;
+            directionVector.Normalize();
 
+            float smoothing = input.MoveInput.sqrMagnitude > 0.001f ? acceleration : desceleration;
+            horizontalVelocity = Vector3.SmoothDamp(horizontalVelocity, directionVector * maxSpeed, ref horizontalAcceleration, smoothing);
+
+            body.MovePosition(horizontalVelocity * Time.deltaTime + body.position);
+        }
+
+        private void Rotate(Transform cameraTransform)
+        {
+            Vector3 cameraForward = cameraTransform.forward;
+            cameraForward.y = 0;
+            cameraForward.Normalize();
+            body.MoveRotation(Quaternion.Slerp(
+                a: body.rotation,
+                b: Quaternion.LookRotation(cameraForward, Vector3.up),
+                t: Time.deltaTime * angularSpeed)
+            );
         }
     }
 }

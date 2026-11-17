@@ -150,14 +150,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3606593fa2020ba4694ab498ca821cb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  target: {fileID: 0}
+  followTarget: {fileID: 0}
   lookInput: {fileID: -5630151704836100654, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  lockInput: {fileID: 1663683594806253377, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   xSensitivity: 0.2
   ySensitivity: 0.2
   inverseY: 0
   distance: 2.63
   anchorOffset: {x: 0.37, y: 1.64, z: 0}
   maxPitch: 30
-  damping: {x: 0, y: 0, z: 0}
+  damping: {x: 0.05, y: 0, z: 0.05}
   targetGuizmoColor: {r: 0.86415094, g: 0.08315413, b: 0.08315413, a: 0.5529412}
   anchorGuizmoColor: {r: 0.11984571, g: 0.10767533, b: 0.8037735, a: 0.7176471}
