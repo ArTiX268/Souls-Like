@@ -9,18 +9,17 @@ namespace ArTiX.SoulsLike.Player
         [SerializeField] private InputActionReference moveInput;
         [SerializeField] private InputActionReference jumpInput;
 
-        public Vector2 MoveInput
-        {
-            get
-            {
-                return moveInput.action.ReadValue<Vector2>();
-            }
-        }
+        public Vector2 MoveInput { get; private set; }
         public event Action OnJump;
 
         private void Awake()
         {
             jumpInput.action.performed += OnJumpInput;
+        }
+
+        private void Update()
+        {
+            MoveInput = moveInput.action.ReadValue<Vector2>();
         }
 
         private void OnJumpInput(InputAction.CallbackContext ctxt)

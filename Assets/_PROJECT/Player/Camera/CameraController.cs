@@ -17,6 +17,8 @@ namespace ArTiX.SoulsLike.Camera
         [SerializeField, Min(0)] private float ySensitivity;
         [SerializeField] private bool inverseY;
 
+        private Vector2 rotationInput;
+
         [Space(5), Header("Parameters")]
         [SerializeField, Min(0)] private float distance;
         [SerializeField, Tooltip("Relative at the pivot point of the camera target.")] private Vector3 anchorOffset;
@@ -36,8 +38,8 @@ namespace ArTiX.SoulsLike.Camera
         private float targetYaw;
         private float targetPitch;
 
-        private bool isLocked;
         private Transform lockedTarget;
+        private bool IsLocked => lockedTarget != null;
 
         private void LateUpdate()
         {
@@ -49,17 +51,14 @@ namespace ArTiX.SoulsLike.Camera
 
             if (Application.isPlaying)
             {
-                Vector2 rotationInput = lookInput.action.ReadValue<Vector2>();
-                rotationInput.x *= xSensitivity;
-                rotationInput.y *= ySensitivity;
-
+                HandleInput();
                 targetYaw += rotationInput.x;
                 targetPitch += rotationInput.y * (inverseY ? 1 : -1);
                 targetPitch = Mathf.Clamp(targetPitch, -maxPitch, maxPitch);
             }
 
             transform.position = CalculateTargetPosition();
-            transform.LookAt(isLocked ? lockedTarget.position : anchorPosition, Vector3.up);
+            transform.LookAt(IsLocked ? lockedTarget.position : anchorPosition, Vector3.up);
         }
 
         private void OnDrawGizmosSelected()
@@ -92,12 +91,20 @@ namespace ArTiX.SoulsLike.Camera
         private void UpdateAnchorPosition()
         {
             Quaternion dampingModifier = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+
             anchorPosition = Utilities.BetterVectorSmoothDamp(
                 a: anchorPosition,
                 b: followTarget.position + anchorOffset,
                 currentVelocity: ref cameraAnchorVelocity,
                 smoothTime: dampingModifier * damping,
                 maxSpeed: Vector3.one * float.MaxValue);
+        }
+
+        private void HandleInput()
+        {
+            rotationInput = lookInput.action.ReadValue<Vector2>();
+            rotationInput.x *= xSensitivity;
+            rotationInput.y *= ySensitivity;
         }
     }
 }
